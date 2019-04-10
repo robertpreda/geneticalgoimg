@@ -27,17 +27,25 @@ def main():
     population = create_population(max_pop)
     generation = 0
     while generation < max_gen:
+        # calculating fitscore for each individual
         for ind in population:
             ind.get_fitscore(target_image)
         print("Generation: ", generation, "\t Fitscore: ", population[0].fitscore)
 
+        # sort individuals by fitscore (ascending - lower score is better)
         population = sorted(population, key=lambda x: x.fitscore)
+
+        # fitscore of 0 means that and individual is identical to the target (improbable though)
         if population[0].fitscore == 0:
             print("Target ")
             break
         new_generation = []
+
+        # take 10% of the current generation, they get to be in the next generation
         s = int((10*max_pop)/100)
         new_generation.extend(population[:s])
+
+        # start crossing
         for _ in range(s):
             parent1 = choice(population[:int(max_pop/2)])
             parent2 = choice(population[:int(max_pop/2)])

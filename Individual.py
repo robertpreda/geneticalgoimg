@@ -27,6 +27,11 @@ class Individual:
         self.target = target
 
     def get_fitscore(self, target):
+        """
+        calculates the pixel-distance between individual and target
+        :param target: the image which to compare the individual to
+        :return: fitscore
+        """
         pixels = list(self.data.getdata())
         tg_px = list(target.getdata())
         s = 0
@@ -50,6 +55,9 @@ class Individual:
 
     def crossover(self, partner):
         child_data = []
+        '''
+            randomly picks genes from one parent or the other
+        '''
         for gp1, gp2 in zip(self.pixels, partner.pixels):
             prob = rand()
             if prob < 0.45:
@@ -61,6 +69,9 @@ class Individual:
         child.putdata(child_data)
         new_child = Individual(child, self.target)
         # mutation
+        '''
+            0.05 is the mutation rate. should be a hyperparameter
+        '''
         if rand() < 0.05:
             new_child = new_child.mutate(0.15)
 
@@ -70,6 +81,9 @@ class Individual:
     def new_individual(cls, target):
         size = len(list(target.getdata()))
         new_genome = []
+        '''
+            picks a random value from [0,255] for each channel (R,G,B). alpha is for now 0 by default
+        '''
         for _ in range(size):
             R = choice(genes)
             G = choice(genes)
