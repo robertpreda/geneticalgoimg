@@ -15,8 +15,9 @@ def pixel_distance(pixel1: object, pixel2: object) -> object:
     a = math.pow((pixel1[0] - pixel2[0]), 2)
     b = math.pow((pixel1[1] - pixel2[1]), 2)
     c = math.pow((pixel1[2] - pixel2[2]), 2)
+    d = math.pow((pixel1[3]) - pixel2[3],2)
 
-    return math.sqrt(a + b + c)
+    return a + b + c + d
 
 
 class Individual:
@@ -37,7 +38,21 @@ class Individual:
         s = 0
         for p1, p2 in zip(pixels, tg_px):
             s += pixel_distance(p1, p2)
-        self.fitscore = int(math.sqrt(math.exp(math.sqrt(s))))
+        self.fitscore = int(math.pow(s,1/2))
+
+    def get_fitscore_v2(self, target):
+    	"""
+    		gives back a percentage of the pixels which are different in the child
+    	"""
+    	different = 0
+    	width, height = target.size
+    	total = width * height
+    	pixels = list(self.data.getdata())
+    	tg_pixels = list(target.getdata())
+    	for p1, p2 in zip(pixels, tg_pixels):
+    		if p1[0] != p2[0] or p1[1] != p2[1] or p1[2] != p2[2] or p1[3] != p2[3]:
+    			different += 1
+    	self.fitscore = (different/total) * 100
 
     def mutate(self,mutation_rate):
         """
@@ -60,7 +75,7 @@ class Individual:
         '''
         for gp1, gp2 in zip(self.pixels, partner.pixels):
             prob = rand()
-            if prob < 0.45:
+            if prob < 0.5:
                 child_data.append(gp1)
             else:
                 child_data.append(gp2)
@@ -72,7 +87,7 @@ class Individual:
         '''
             0.05 is the mutation rate. should be a hyperparameter
         '''
-        if rand() < 0.05:
+        if rand() < 0.09:
             new_child = new_child.mutate(0.15)
 
         return new_child
@@ -88,7 +103,8 @@ class Individual:
             R = choice(genes)
             G = choice(genes)
             B = choice(genes)
-            px = (R, G, B)
+            A = choice(genes)
+            px = (R, G, B,A)
             new_genome.append(px)
         child = Image.new(target.mode, target.size)
         child.putdata(new_genome)
